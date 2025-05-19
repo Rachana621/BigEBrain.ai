@@ -1,9 +1,0 @@
-cors
-dotenv
-exceljs
-express
-glob
-googleapis
-mongoose
-nodemailer
-xlsx

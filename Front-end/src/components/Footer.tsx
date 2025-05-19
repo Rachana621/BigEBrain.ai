@@ -95,22 +95,22 @@ const Footer = () => {
         {/* Address */}
         <div className="lg:col-span-2">
           <h4 className="text-lg font-semibold flex items-center mb-3">
-            <FaMapMarkerAlt className="mr-2 text-teal-500" /> Address
-          </h4>
-          <div className="text-gray-300 text-sm pl-6">
             <a
               href={googleMapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-teal-400 transition-colors"
+              className="flex items-center hover:text-teal-400 transition-colors"
             >
-              <p>BigEBrains Headquarters</p>
-              <p>
-                Big E Brains, 4th Floor, Maa Nilayam, opposite SRM WESTIN
-                Hospital, Jaihind Colony, Silicon Valley, Madhapur, Hyderabad,
-                Telangana 500081.
-              </p>
+              <FaMapMarkerAlt className="mr-2 text-teal-500" /> Address
             </a>
+          </h4>
+          <div className="text-gray-300 text-sm pl-6">
+            <p>BigEBrains Headquarters</p>
+            <p>
+              Big E Brains, 4th Floor, Maa Nilayam, opposite SRM WESTIN
+              Hospital, Jaihind Colony, Silicon Valley, Madhapur, Hyderabad,
+              Telangana 500081.
+            </p>
           </div>
         </div>
       </div>

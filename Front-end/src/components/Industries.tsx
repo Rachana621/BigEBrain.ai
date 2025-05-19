@@ -37,6 +37,11 @@ const Industries = () => {
     },
   ];
 
+  // Function to handle navigation with scroll to top
+  const handleScrollToTop = () => {
+    window.scrollTo(0, 0);
+  };
+
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4 md:px-6">
@@ -50,7 +55,11 @@ const Industries = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {industries.map((industry, index) => (
-            <Link to={industry.link} key={index}>
+            <Link 
+              to={industry.link} 
+              key={index} 
+              onClick={handleScrollToTop}
+            >
               <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
                 <div className="relative h-60">
                   <img 
@@ -69,7 +78,7 @@ const Industries = () => {
         </div>
 
         <div className="text-center mt-14">
-          <Link to="/Indus">
+          <Link to="/Indus" onClick={handleScrollToTop}>
             <Button variant="outline" className="border-bigebrains-blue text-bigebrains-blue hover:bg-bigebrains-blue hover:text-white px-8 py-6 text-lg">
               View all industries
             </Button>

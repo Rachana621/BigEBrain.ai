@@ -1,5 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,39 +17,57 @@ const ContactForm = () => {
   });
 
   const [status, setStatus] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Form validation
+    if (!formData.firstName || !formData.email || !formData.phone || !formData.helpType) {
+      setStatus("Please fill in all required fields.");
+      return;
+    }
+
+    setIsSubmitting(true);
     setStatus("Sending...");
 
+    // Google Apps Script URL - you'll need to replace this with your deployed script URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwWU7sBI9SZ_MiL_j7AMQ23_s99wz8jzja81PMh3qUHwE8QgBzJsvKU0aXUGTtP27z9dQ/exec';
+
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/contacts/api/contact`, {
+      const response = await fetch(scriptURL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        mode: 'no-cors', // This is important for cross-origin requests to Google Apps Script
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          timestamp: new Date().toISOString()
+        }),
       });
 
-      if (res.ok) {
-        setStatus("Submitted successfully! Check your email.");
-        setFormData({
-          firstName: '',
-          lastName: '',
-          company: '',
-          email: '',
-          phone: '',
-          helpType: '',
-          message: ''
-        });
-      } else {
-        setStatus("Failed to submit. Please try again.");
-      }
-    } catch (err) {
-      console.error(err);
-      setStatus("An error occurred.");
+      // Since mode is no-cors, we can't actually read the response
+      // So we assume it was successful if no error was thrown
+      setStatus("Submitted successfully! Check your email.");
+      setFormData({
+        firstName: '',
+        lastName: '',
+        company: '',
+        email: '',
+        phone: '',
+        helpType: '',
+        message: ''
+      });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setStatus("An error occurred. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -124,39 +140,65 @@ const ContactForm = () => {
               <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">First name</Label>
-                    <Input id="firstName" value={formData.firstName} onChange={handleChange} />
+                    <Label htmlFor="firstName">First name*</Label>
+                    <Input 
+                      id="firstName" 
+                      value={formData.firstName} 
+                      onChange={handleChange} 
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last name</Label>
-                    <Input id="lastName" value={formData.lastName} onChange={handleChange} />
+                    <Input 
+                      id="lastName" 
+                      value={formData.lastName} 
+                      onChange={handleChange} 
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="company">Company / Organization</Label>
-                  <Input id="company" value={formData.company} onChange={handleChange} />
+                  <Input 
+                    id="company" 
+                    value={formData.company} 
+                    onChange={handleChange} 
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Company email</Label>
-                  <Input id="email" type="email" value={formData.email} onChange={handleChange} />
+                  <Label htmlFor="email">Company email*</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    value={formData.email} 
+                    onChange={handleChange} 
+                    required
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input id="phone" type="tel" value={formData.phone} onChange={handleChange} />
+                  <Label htmlFor="phone">Phone*</Label>
+                  <Input 
+                    id="phone" 
+                    type="tel" 
+                    value={formData.phone} 
+                    onChange={handleChange} 
+                    required
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="helpType">How Can We Help You?</Label>
+                  <Label htmlFor="helpType">How Can We Help You?*</Label>
                   <select
                     id="helpType"
                     className="w-full p-2 border border-gray-300 rounded-md"
                     value={formData.helpType}
                     onChange={handleChange}
+                    required
                   >
-                    <option>Select option*</option>
+                    <option value="">Select option*</option>
                     <option>IT Consulting</option>
                     <option>Managed Services</option>
                     <option>Web Development</option>
@@ -176,10 +218,21 @@ const ContactForm = () => {
                   />
                 </div>
 
-                <Button type="submit" className="w-full bg-bigebrains-blue hover:bg-bigebrains-darkblue text-white">
-                  Submit
+                <Button 
+                  type="submit" 
+                  className="w-full bg-bigebrains-blue hover:bg-bigebrains-darkblue text-white"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit"}
                 </Button>
-                {status && <p className="text-center mt-2 text-sm text-gray-700">{status}</p>}
+                {status && (
+                  <p className={`text-center mt-2 text-sm ${
+                    status.includes("success") ? "text-green-600" : 
+                    status.includes("error") ? "text-red-600" : "text-gray-700"
+                  }`}>
+                    {status}
+                  </p>
+                )}
               </form>
             </div>
           </div>
@@ -190,7 +243,3 @@ const ContactForm = () => {
 };
 
 export default ContactForm;
-
-
-
-

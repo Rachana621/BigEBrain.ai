@@ -1,9 +1,13 @@
-import React from "react";
-
+import React, { useEffect } from "react";
 import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
 
 const Solutions = () => {
+  // Add this useEffect to scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div>
       <main className="container mx-auto px-4 py-12">
@@ -45,7 +49,7 @@ const Solutions = () => {
           <ContactForm />
         </div>
       </main>
-
+      
       {/* Footer Section */}
       <Footer />
     </div>
